@@ -1,0 +1,2 @@
+SELECT COUNT(*) FROM spieler
+WHERE YEAR(beitritt)-YEAR(geboren)BETWEEN 20 AND 30
