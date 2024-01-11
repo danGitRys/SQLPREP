@@ -1,0 +1,46 @@
+Und Teil bei Aufgaben nicht vergessen
+Klausur nicht auf Kante genäht
+Systematisch bei den SQL Aufgaben vorgehen
+Erste 11-12 Aufgaben Wiederholung DB2
+Bei den nächsten Aufgaben immer mehr einschränkungen, Sub Selects etc.
+Folie Datenbankimplementierung S.57 anschauen
+Indikator Outer Join: Schreibe mir die Namen aller Mitarbeiter auf und falls sie ein Dienstwagen haben das Kennzeichen
+-Stichwort Falls Gegebenfalls
+Alle Kunden die Rechnungen erhalten haben, Distinct, Subquery um sicher zu stellen dass Kunden nicht doppelt angezeigt werden
+UNION nicht erlaubt 
+Der Rest aus der Mengenlehre schon
+Nicht Gedanklich so vorgehen dass man weiß das man in die Datenbank reinschauen kann
+Meistens kommt auch eine Aufgabe aus den Übungsaufgaben dran.
+ER-Modellierung kann auch dran kommen
+Aufgabenniveau mäßig ganzes Spektrum vom Labor abgedeckt
+Teil der Aufgaben im gleichen Datenbank System wie das Labor
+Kann jedoch auch andere Aufgaben die dann ein anderes System nutzen
+Letztes Semester waren bei der Mikromodellierung 1 zu 1 Aufgaben aus dem Labor dran
+Aufbau von SQL Programmierung gibt schon viele Punkte
+Skript Labor Verhältnis 50% 50%   (Schätzung keine Garantie)
+Nicht auf Lücke lernen
+Hash Verfahren kann drankommen
+ALTER Table kam noch nie dran
+Create View kam schon mal dran
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---------------------------------
+Überlegungen
+Komplexe Bediungsaufgabe mit Subquery pro Bedingung
