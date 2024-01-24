@@ -1,4 +1,4 @@
-SELECT s.name, s.vorname
+SELECT s.name, s.vorname, SUM(strafe.strafe), COUNT(strafe.strafe), AVG(strafe.strafe) 
 FROM spieler s
 JOIN strafe ON strafe.spielernr = s.spielernr
 WHERE strafe.strafe >= 30
