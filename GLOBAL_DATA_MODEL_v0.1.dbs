@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="GLOBAL_DATA_MODEL" database="LogicalDesign" id="LogicalDesign-55b" >
+	<comment><![CDATA[V0.1]]></comment>
+	<schema name="INSTANCE" catalogname="GLOBAL_DATA_MODEL" >
+		<table name="course" prior="class" >
+			<column name="subject" type="INT" jt="4" mandatory="y" />
+			<column name="teacher" prior="teacher id" type="INT" jt="4" mandatory="y" />
+			<column name="semester curriculum" type="INT" jt="4" mandatory="y" />
+			<column name="actual stupo hours" type="INT" jt="4" />
+			<column name="actual schedule hours" type="INT" jt="4" />
+			<column name="credited teacher hours" prior="credited hours" type="INT" jt="4" />
+			<column name="remark" type="VARCHAR" length="255" jt="12" />
+			<index name="pk_course" unique="PRIMARY_KEY" >
+				<column name="subject" />
+				<column name="teacher" />
+			</index>
+			<fk name="fk_subject_teacher_subject" to_schema="GLOBAL_DATA_MODEL.INSTANCE" to_table="subject" type="Identifying" mandatory="y" cardinality="One" range_from="0" range_to="0" >
+				<fk_column name="subject" pk="subject number" />
+			</fk>
+			<fk name="fk_subject_teacher_teacher" to_schema="GLOBAL_DATA_MODEL.INSTANCE" to_table="teacher" type="Identifying" mandatory="y" cardinality="One" range_from="0" range_to="0" >
+				<fk_column name="teacher" pk="id" />
+			</fk>
+			<fk name="fk_course_semester curriculum" to_schema="GLOBAL_DATA_MODEL.INSTANCE" to_table="semester curriculum" type="Identifying" mandatory="y" cardinality="One" range_from="0" range_to="0" >
+				<fk_column name="semester curriculum" pk="semester curriculum id" />
+			</fk>
+		</table>
+		<table name="faculty" prior="Entity" >
+			<column name="abbreviation" prior="faculty abbreviation" type="VARCHAR" length="5" jt="12" mandatory="y" />
+			<column name="name" type="VARCHAR" length="100" jt="12" mandatory="y" />
+			<index name="pk_faculty" unique="PRIMARY_KEY" >
+				<column name="abbreviation" />
+			</index>
+		</table>
+		<table name="function" prior="Entity" >
+			<column name="function start" type="VARCHAR" length="10" jt="12" mandatory="y" />
+			<column name="professor" type="INT" jt="4" mandatory="y" />
+			<column name="name" type="VARCHAR" length="100" jt="12" mandatory="y" />
+			<column name="load" type="INT" jt="4" mandatory="y" />
+			<index name="pk_new" unique="PRIMARY_KEY" >
+				<column name="function start" />
+				<column name="professor" />
+				<column name="name" />
+			</index>
+			<fk name="fk_function_professor" to_schema="GLOBAL_DATA_MODEL.INSTANCE" to_table="professor" type="Identifying" mandatory="y" cardinality="One" range_from="0" range_to="0" >
+				<fk_column name="professor" pk="id" />
+			</fk>
+		</table>
+		<table name="lecturer" prior="Entity" >
+			<column name="id" prior="teacher" type="INT" jt="4" mandatory="y" />
+			<column name="address" type="VARCHAR" length="100" jt="12" />
+			<index name="pk_lecturer" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<fk name="fk_lecturer_teacher" to_schema="GLOBAL_DATA_MODEL.INSTANCE" to_table="teacher" type="NonIdentifying" mandatory="y" cardinality="One" range_from="0" range_to="0" >
+				<fk_column name="id" pk="id" />
+			</fk>
+		</table>
+		<table name="major" prior="Entity" >
+			<column name="abbreviation" prior="abbreviati" type="VARCHAR" length="5" jt="12" mandatory="y" />
+			<column name="name" type="VARCHAR" length="100" jt="12" mandatory="y" />
+			<column name="faculty" prior="faculty abbreviation" type="VARCHAR" length="5" jt="12" mandatory="y" />
+			<index name="pk_major" unique="PRIMARY_KEY" >
+				<column name="abbreviation" />
+			</index>
+			<fk name="fk_major_faculty" to_schema="GLOBAL_DATA_MODEL.INSTANCE" to_table="faculty" type="NonIdentifying" mandatory="y" cardinality="One" range_from="0" range_to="0" >
+				<fk_column name="faculty" pk="abbreviation" />
+			</fk>
+		</table>
+		<table name="professor" prior="Entity" >
+			<column name="id" prior="teacher" type="INT" jt="4" mandatory="y" />
+			<column name="credit hour account" type="DECIMAL" jt="3" />
+			<index name="pk_professor" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<fk name="fk_professor_teacher" to_schema="GLOBAL_DATA_MODEL.INSTANCE" to_table="teacher" type="NonIdentifying" mandatory="y" cardinality="One" range_from="0" range_to="0" >
+				<fk_column name="id" pk="id" />
+			</fk>
+		</table>
+		<table name="semester curriculum" prior="Entity" >
+			<column name="semester curriculum id" type="INT" jt="4" mandatory="y" />
+			<column name="major" type="VARCHAR" length="5" jt="12" mandatory="y" />
+			<column name="semester" type="INT" jt="4" mandatory="y" />
+			<column name="semester start" type="DATE" jt="91" mandatory="y" />
+			<index name="pk_semester curriculum" unique="PRIMARY_KEY" >
+				<column name="semester curriculum id" />
+			</index>
+			<fk name="fk_semester curriculum_major" to_schema="GLOBAL_DATA_MODEL.INSTANCE" to_table="major" type="NonIdentifying" mandatory="y" cardinality="One" range_from="0" range_to="0" >
+				<fk_column name="major" pk="abbreviation" />
+			</fk>
+		</table>
+		<table name="subject" prior="Entity" >
+			<column name="subject number" type="INT" jt="4" mandatory="y" />
+			<column name="subject name" type="VARCHAR" length="100" jt="12" mandatory="y" />
+			<column name="subject type" type="CHAR" length="1" jt="1" >
+				<defo><![CDATA['P']]></defo>
+			</column>
+			<column name="planned stupo hours" type="INT" jt="4" mandatory="y" />
+			<column name="planned schedule hours" type="INT" jt="4" mandatory="y" />
+			<column name="remark" type="VARCHAR" length="255" jt="12" />
+			<column name="providing faculty" prior="faculty abbreviation" type="VARCHAR" length="5" jt="12" mandatory="y" />
+			<column name="using faculty" prior="faculty abbreviation" type="VARCHAR" length="5" jt="12" mandatory="y" />
+			<index name="pk_subject" unique="PRIMARY_KEY" >
+				<column name="subject number" />
+			</index>
+			<fk name="fk_subject_faculty" to_schema="GLOBAL_DATA_MODEL.INSTANCE" to_table="faculty" type="NonIdentifying" mandatory="y" cardinality="One" range_from="0" range_to="0" >
+				<fk_column name="providing faculty" pk="abbreviation" />
+			</fk>
+			<fk name="fk_subject_faculty_0" to_schema="GLOBAL_DATA_MODEL.INSTANCE" to_table="faculty" type="NonIdentifying" mandatory="y" cardinality="ZeroOne" range_from="0" range_to="0" >
+				<fk_column name="using faculty" pk="abbreviation" />
+			</fk>
+		</table>
+		<table name="teacher" prior="Entity" >
+			<column name="id" prior="teacher id" type="INT" jt="4" mandatory="y" />
+			<column name="name" type="VARCHAR" length="100" jt="12" mandatory="y" />
+			<column name="faculty" prior="faculty abbreviation" type="VARCHAR" length="5" jt="12" mandatory="y" />
+			<index name="unq_teacher id" unique="UNIQUE_INDEX" >
+				<column name="id" />
+			</index>
+			<index name="pk_teacher" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<fk name="fk_teacher_faculty" to_schema="GLOBAL_DATA_MODEL.INSTANCE" to_table="faculty" type="Identifying" mandatory="y" cardinality="One" range_from="0" range_to="0" >
+				<fk_column name="faculty" pk="abbreviation" />
+			</fk>
+		</table>
+		<table name="workload" prior="Entity" >
+			<column name="workload start" type="VARCHAR" length="10" jt="12" mandatory="y" />
+			<column name="professor" prior="teacher" type="INT" jt="4" mandatory="y" />
+			<column name="hours" type="INT" jt="4" />
+			<index name="pk" unique="PRIMARY_KEY" >
+				<column name="workload start" />
+				<column name="professor" />
+			</index>
+			<fk name="fk_workload_professor" to_schema="GLOBAL_DATA_MODEL.INSTANCE" to_table="professor" type="NonIdentifying" mandatory="y" cardinality="One" range_from="0" range_to="0" >
+				<fk_column name="professor" pk="id" />
+			</fk>
+		</table>
+	</schema>
+	<layout name="Default Layout" id="Layout-190d" show_relation="columns" >
+		<entity schema="GLOBAL_DATA_MODEL.INSTANCE" name="course" color="C1D8EE" x="425" y="731" />
+		<entity schema="GLOBAL_DATA_MODEL.INSTANCE" name="faculty" color="C1D8EE" x="714" y="272" />
+		<entity schema="GLOBAL_DATA_MODEL.INSTANCE" name="function" color="C1D8EE" x="51" y="187" />
+		<entity schema="GLOBAL_DATA_MODEL.INSTANCE" name="lecturer" color="C1D8EE" x="493" y="85" />
+		<entity schema="GLOBAL_DATA_MODEL.INSTANCE" name="major" color="C1D8EE" x="1020" y="272" />
+		<entity schema="GLOBAL_DATA_MODEL.INSTANCE" name="professor" color="C1D8EE" x="272" y="85" />
+		<entity schema="GLOBAL_DATA_MODEL.INSTANCE" name="semester curriculum" color="C1D8EE" x="969" y="748" />
+		<entity schema="GLOBAL_DATA_MODEL.INSTANCE" name="subject" color="C1D8EE" x="697" y="493" />
+		<entity schema="GLOBAL_DATA_MODEL.INSTANCE" name="teacher" color="C1D8EE" x="425" y="272" />
+		<entity schema="GLOBAL_DATA_MODEL.INSTANCE" name="workload" color="C1D8EE" x="51" y="51" />
+	</layout>
+</project>
