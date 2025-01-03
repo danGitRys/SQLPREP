@@ -1,0 +1,784 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="GLOBAL_DATA_MODEL" database="Db2" id="Db2-b35" >
+	<comment><![CDATA[V0.1]]></comment>
+	<schema name="INSTANCE" catalogname="GLOBAL_DATA_MODEL" >
+		<table name="COURSE" prior="course" >
+			<comment><![CDATA[A class that is held by a teacher in a specific semester (such as "WS24/25").]]></comment>
+			<column name="COURSE_START" prior="course_start" type="VARCHAR" length="10" jt="12" mandatory="y" >
+				<comment><![CDATA[The semester in which a class starts.
+E.g. "WS24/25"]]></comment>
+			</column>
+			<column name="SUBJECT" prior="subject" type="VARCHAR" length="15" jt="12" mandatory="y" >
+				<comment><![CDATA[The subject (number) which is taught in this course.
+E.g. "R39.04995"]]></comment>
+			</column>
+			<column name="TEACHER" prior="teacher" type="VARCHAR" length="15" jt="12" mandatory="y" >
+				<comment><![CDATA[The teacher (id) teaching this course.]]></comment>
+			</column>
+			<column name="ACTUAL_STUPO_HOURS" prior="actual_stupo_hours" type="INTEGER" jt="4" >
+				<comment><![CDATA[The actual hours for this subject according to the StuPo.
+E.g. "2"]]></comment>
+			</column>
+			<column name="ACTUAL_SCHEDULE_HOURS" prior="actual_schedule_hours" type="INTEGER" jt="4" >
+				<comment><![CDATA[The actual hours for this subject according to the schedule.
+E.g. "2"]]></comment>
+			</column>
+			<column name="CREDITED_TEACHER_HOURS" prior="credited_teacher_hours" type="INTEGER" jt="4" >
+				<comment><![CDATA[The hours that will be credited to the teacher. This is part of the teacher's workload.
+E.g. "1"]]></comment>
+			</column>
+			<column name="REMARK" prior="remark" type="VARCHAR" length="255" jt="12" >
+				<comment><![CDATA[An optional remark about the course.]]></comment>
+			</column>
+			<index name="PK_COURSE" unique="PRIMARY_KEY" >
+				<comment><![CDATA[Primary key consisting of the course start and the subject number, which is a foreign key.]]></comment>
+				<column name="SUBJECT" />
+				<column name="COURSE_START" />
+				<column name="TEACHER" />
+			</index>
+			<constraint name="CNS_COURSE" >
+				<string><![CDATA[ACTUAL_SCHEDULE_HOURS % 2 = 0 AND ACTUAL_SCHEDULE_HOURS >= 0 AND ACTUAL_SCHEDULE_HOURS <= 10]]></string>
+			</constraint>
+			<constraint name="CNS_COURSE_0" >
+				<string><![CDATA[ACTUAL_STUPO_HOURS >= 0 AND ACTUAL_STUPO_HOURS <= 10]]></string>
+			</constraint>
+			<constraint name="CNS_COURSE_1" >
+				<string><![CDATA[CREDITED_TEACHER_HOURS >= 0 AND CREDITED_TEACHER_HOURS <= 10]]></string>
+			</constraint>
+			<fk name="FK_SUBJECT_TEACHER_SUBJECT" to_schema="GLOBAL_DATA_MODEL.INSTANCE" to_table="SUBJECT" >
+				<fk_column name="SUBJECT" pk="SUBJECT_NUMBER" />
+			</fk>
+			<fk name="FK_SUBJECT_TEACHER_TEACHER" to_schema="GLOBAL_DATA_MODEL.INSTANCE" to_table="TEACHER" >
+				<fk_column name="TEACHER" pk="ID" />
+			</fk>
+		</table>
+		<table name="FACULTY" prior="faculty" >
+			<comment><![CDATA[An academic unit that specializes in a particular field and contains related subjects]]></comment>
+			<column name="ABBREVIATION" prior="abbreviation" type="VARCHAR" length="5" jt="12" mandatory="y" >
+				<comment><![CDATA[An identifying abbreviation for the faculty.
+E.g. "IT"]]></comment>
+			</column>
+			<column name="NAME" prior="name" type="VARCHAR" length="100" jt="12" mandatory="y" >
+				<comment><![CDATA[The full name of the faculty.
+E.g. "Information Technology"]]></comment>
+			</column>
+			<index name="PK_FACULTY" unique="PRIMARY_KEY" >
+				<comment><![CDATA[Primary key consisting of the faculty abbreviation.]]></comment>
+				<column name="ABBREVIATION" />
+			</index>
+		</table>
+		<table name="FUNCTION_PROFESSOR" prior="FUNCTION" >
+			<comment><![CDATA[Responsibilities undertaken by a professor related to the management and organization of academic programs, faculty governance, and departmental operations.]]></comment>
+			<column name="FUNCTION_START" prior="function_start" type="VARCHAR" length="10" jt="12" mandatory="y" >
+				<comment><![CDATA[The semester in which a function starts.
+E.g. "WS24/25"]]></comment>
+			</column>
+			<column name="PROFESSOR" prior="professor" type="VARCHAR" length="15" jt="12" mandatory="y" >
+				<comment><![CDATA[The professor (id) which exercises this function.]]></comment>
+			</column>
+			<column name="NAME" prior="name" type="VARCHAR" length="100" jt="12" mandatory="y" >
+				<comment><![CDATA[The name of the function.
+E.g. "Head of internship office"]]></comment>
+			</column>
+			<column name="LOAD" prior="load" type="INTEGER" jt="4" mandatory="y" >
+				<comment><![CDATA[The hourly load of the function.
+E.g. "2"]]></comment>
+			</column>
+			<index name="PK_FUNC_PROF_NAME" unique="PRIMARY_KEY" >
+				<comment><![CDATA[Primary key consisting of the function start, the professor and the name of the function.]]></comment>
+				<column name="FUNCTION_START" />
+				<column name="PROFESSOR" />
+				<column name="NAME" />
+			</index>
+			<constraint name="CNS_FUNCTION" >
+				<string><![CDATA[LOAD >= 0 AND LOAD <= 10]]></string>
+			</constraint>
+			<fk name="FK_FUNCTION_PROFESSOR" to_schema="GLOBAL_DATA_MODEL.INSTANCE" to_table="PROFESSOR" >
+				<fk_column name="PROFESSOR" pk="TEACHER_ID" />
+			</fk>
+		</table>
+		<table name="LECTURER" prior="lecturer" >
+			<comment><![CDATA[A contracted teacher, also known as "lecturer" in the project document.]]></comment>
+			<column name="TEACHER_ID" prior="teacher_id" type="VARCHAR" length="15" jt="12" mandatory="y" >
+				<comment><![CDATA[An identifying number for the teacher.
+Foreign Key from the teacher table.]]></comment>
+			</column>
+			<column name="ADDRESS" prior="address" type="VARCHAR" length="100" jt="12" mandatory="y" >
+				<comment><![CDATA[Address of the lecturer.
+In order to be able to write to the lecturers.
+E.g. "Kanalstraße 33, Esslingen"]]></comment>
+			</column>
+			<column name="IS_ACTIVE" type="BOOLEAN" jt="16" mandatory="y" />
+			<index name="PK_LECTURER" unique="PRIMARY_KEY" >
+				<comment><![CDATA[Primary key consisting of the teacher id, which is also a foreign key.]]></comment>
+				<column name="TEACHER_ID" />
+			</index>
+			<fk name="FK_LECTURER_TEACHER" to_schema="GLOBAL_DATA_MODEL.INSTANCE" to_table="TEACHER" >
+				<fk_column name="TEACHER_ID" pk="ID" />
+			</fk>
+		</table>
+		<table name="MAJOR" prior="major" >
+			<comment><![CDATA[A degree program.]]></comment>
+			<column name="ABBREVIATION" prior="abbreviation" type="VARCHAR" length="5" jt="12" mandatory="y" >
+				<comment><![CDATA[An identifying abbreviation for the major.
+E.g. "SWB"]]></comment>
+			</column>
+			<column name="NAME" prior="name" type="VARCHAR" length="100" jt="12" mandatory="y" >
+				<comment><![CDATA[The full name for the major.
+E.g. "Software Engineering and Media Computing"]]></comment>
+			</column>
+			<column name="FACULTY" prior="faculty" type="VARCHAR" length="5" jt="12" mandatory="y" >
+				<comment><![CDATA[The faculty a major belongs to.
+E.g. "IT" for "Software Engineering and Media Computing"]]></comment>
+			</column>
+			<index name="PK_MAJOR" unique="PRIMARY_KEY" >
+				<comment><![CDATA[Primary key consisting of the major abbreviation.]]></comment>
+				<column name="ABBREVIATION" />
+			</index>
+			<fk name="FK_MAJOR_FACULTY" to_schema="GLOBAL_DATA_MODEL.INSTANCE" to_table="FACULTY" >
+				<fk_column name="FACULTY" pk="ABBREVIATION" />
+			</fk>
+		</table>
+		<table name="PROFESSOR" prior="professor" >
+			<comment><![CDATA[A permanently employed academic who is responsible for teaching and research, also known as "professor" in the project document.]]></comment>
+			<column name="TEACHER_ID" prior="teacher_id" type="VARCHAR" length="15" jt="12" mandatory="y" >
+				<comment><![CDATA[An identifying number for the professor.
+Foreign Key from the teacher table.]]></comment>
+			</column>
+			<column name="CREDIT_HOUR_ACCOUNT" prior="credit_hour_account" type="DECIMAL" jt="3" mandatory="y" >
+				<defo><![CDATA[0]]></defo>
+				<comment><![CDATA[Additional work beyond the 18 compulsory work hours  for a professor is credited to a credit hour account, less work is debited from this account.
+E.g. "2"]]></comment>
+			</column>
+			<column name="IS_ACTIVE" type="BOOLEAN" jt="16" mandatory="y" />
+			<index name="PK_PROFESSOR" unique="PRIMARY_KEY" >
+				<comment><![CDATA[Primary key consisting of the professor id, which is also a foreign key.]]></comment>
+				<column name="TEACHER_ID" />
+			</index>
+			<fk name="FK_PROFESSOR_TEACHER" to_schema="GLOBAL_DATA_MODEL.INSTANCE" to_table="TEACHER" >
+				<fk_column name="TEACHER_ID" pk="ID" />
+			</fk>
+		</table>
+		<table name="SEARCH_CRITERIA" prior="SEARCH_CRITERIA " >
+			<comment><![CDATA[A table necessary for user views.]]></comment>
+			<column name="SEMESTER_START" type="VARCHAR" length="10" jt="12" mandatory="y" >
+				<comment><![CDATA[The semester for which the data is shown.
+E.g. "WS24/25"]]></comment>
+			</column>
+			<column name="MAJOR" type="VARCHAR" length="5" jt="12" mandatory="y" >
+				<comment><![CDATA[The major for which the data is shown.
+E.g. "SWB"]]></comment>
+			</column>
+			<column name="SEMESTER" type="INTEGER" jt="4" mandatory="y" >
+				<comment><![CDATA[The semester of a major for which the data is shown.
+E.g. "6" for "SWB"]]></comment>
+			</column>
+		</table>
+		<table name="SUBJECT" prior="subject" >
+			<comment><![CDATA[A specific subject listed in the curriculum of a major.]]></comment>
+			<column name="SUBJECT_NUMBER" prior="subject_number" type="VARCHAR" length="15" jt="12" mandatory="y" >
+				<comment><![CDATA[An identifying number for the subject.
+E.g. "R39.04995"]]></comment>
+			</column>
+			<column name="SUBJECT_NAME" prior="subject_name" type="VARCHAR" length="100" jt="12" mandatory="y" >
+				<comment><![CDATA[The name of a subject.
+E.g. "Information Systems"]]></comment>
+			</column>
+			<column name="SUBJECT_TYPE" prior="subject_type" type="CHAR" length="1" jt="1" mandatory="y" >
+				<defo><![CDATA['P']]></defo>
+				<comment><![CDATA[If the subject is an compulsory "P", elective "W" or supplementary "Z"
+E.g. "P" for "Information Systems"]]></comment>
+			</column>
+			<column name="PLANNED_STUPO_HOURS" prior="planned_stupo_hours" type="INTEGER" jt="4" mandatory="y" >
+				<comment><![CDATA[The planned hours for this subject according to the StuPo.
+E.g. "2"]]></comment>
+			</column>
+			<column name="PLANNED_SCHEDULE_HOURS" prior="planned_schedule_hours" type="INTEGER" jt="4" mandatory="y" >
+				<comment><![CDATA[The planned hours for this subject according to the schedule.
+E.g. "2"]]></comment>
+			</column>
+			<column name="SEMESTER" prior="semester" type="INTEGER" jt="4" >
+				<comment><![CDATA[The planned semester for this subject according to the curriculum.
+E.g. "6" for "Information Systems"]]></comment>
+			</column>
+			<column name="MAJOR" prior="major" type="VARCHAR" length="5" jt="12" >
+				<comment><![CDATA[The major to which this subject belongs to.
+E.g. "SWB"]]></comment>
+			</column>
+			<column name="FACULTY" prior="faculty" type="VARCHAR" length="5" jt="12" mandatory="y" >
+				<comment><![CDATA[The faculty of this subject.
+E.g. "IT"]]></comment>
+			</column>
+			<column name="REMARK" prior="remark" type="VARCHAR" length="255" jt="12" >
+				<comment><![CDATA[An optional remark about the subject.]]></comment>
+			</column>
+			<index name="PK_SUBJECT" unique="PRIMARY_KEY" >
+				<comment><![CDATA[Primary key consisting of the subject number.]]></comment>
+				<column name="SUBJECT_NUMBER" />
+			</index>
+			<constraint name="PSTUH_SUBJECT" >
+				<string><![CDATA[PLANNED_STUPO_HOURS >= 0 AND PLANNED_STUPO_HOURS <= 10]]></string>
+			</constraint>
+			<constraint name="PSCHH_SUBJECT" >
+				<string><![CDATA[PLANNED_SCHEDULE_HOURS >= 0 AND PLANNED_SCHEDULE_HOURS <= 10]]></string>
+			</constraint>
+			<constraint name="CNS_SUBJECT" >
+				<string><![CDATA[SEMESTER BETWEEN 1 AND 7]]></string>
+			</constraint>
+			<fk name="FK_SUBJECT_FACULTY" to_schema="GLOBAL_DATA_MODEL.INSTANCE" to_table="FACULTY" >
+				<fk_column name="FACULTY" pk="ABBREVIATION" />
+			</fk>
+			<fk name="FK_SUBJECT_MAJOR" to_schema="GLOBAL_DATA_MODEL.INSTANCE" to_table="MAJOR" >
+				<fk_column name="MAJOR" pk="ABBREVIATION" />
+			</fk>
+		</table>
+		<table name="TEACHER" prior="teacher" >
+			<comment><![CDATA[A person teaching a course.]]></comment>
+			<column name="ID" prior="id" type="VARCHAR" length="15" jt="12" mandatory="y" >
+				<comment><![CDATA[An identifying number for the teacher.]]></comment>
+			</column>
+			<column name="NAME" prior="name" type="VARCHAR" length="100" jt="12" mandatory="y" >
+				<comment><![CDATA[The name of the teacher.
+E.g. "Steffen Schober"]]></comment>
+			</column>
+			<column name="FACULTY" prior="faculty" type="VARCHAR" length="5" jt="12" mandatory="y" >
+				<comment><![CDATA[The faculty the teacher belongs to.
+E.g. "IT" for "Steffen Schober"]]></comment>
+			</column>
+			<column name="REMARK" prior="remark" type="VARCHAR" length="255" jt="12" >
+				<comment><![CDATA[An optional remark made by the teacher about themselves.]]></comment>
+			</column>
+			<index name="PK_TEACHER" unique="PRIMARY_KEY" >
+				<comment><![CDATA[Primary key consisting of the teacher id.]]></comment>
+				<column name="ID" />
+			</index>
+			<fk name="FK_TEACHER_FACULTY" to_schema="GLOBAL_DATA_MODEL.INSTANCE" to_table="FACULTY" >
+				<fk_column name="FACULTY" pk="ABBREVIATION" />
+			</fk>
+		</table>
+		<view name="VW_ACTIVE_LECTURER_WORKLOAD" >
+			<comment><![CDATA[The lecturer workload for the selected semester ("WS1516").]]></comment>
+			<view_script><![CDATA[CREATE OR REPLACE VIEW ${nameWithSchemaName} AS
+SELECT 
+    -- Teacher details
+    t.ID AS TEACHER_ID,
+    t.NAME AS TEACHER_NAME,
+    
+    -- Workload calculation (sum of credited teacher hours)
+    COALESCE(SUM(c.CREDITED_TEACHER_HOURS), 0) AS WORKLOAD
+    
+FROM 
+    INSTANCE.LECTURER l
+JOIN 
+    INSTANCE.TEACHER t ON t.ID = l.TEACHER_ID
+LEFT JOIN 
+    INSTANCE.COURSE c ON c.TEACHER = t.ID
+JOIN
+    INSTANCE.SEARCH_CRITERIA sc ON sc.SEMESTER_START = c.COURSE_START
+WHERE 
+    l.IS_ACTIVE = TRUE
+GROUP BY 
+    t.ID, t.NAME]]></view_script>
+			<column name="TEACHER_ID" type="VARCHAR" />
+			<column name="TEACHER_NAME" type="VARCHAR" />
+			<column name="WORKLOAD" type="INTEGER" />
+		</view>
+		<view name="VW_ACTIVE_PROFESSOR_WORKLOAD" >
+			<comment><![CDATA[The professor workload for the selected semester ("WS1516").]]></comment>
+			<view_script><![CDATA[CREATE OR REPLACE VIEW ${nameWithSchemaName} AS
+SELECT 
+    -- Teacher details
+    t.ID AS TEACHER_ID,
+    t.NAME AS TEACHER_NAME,
+    p.CREDIT_HOUR_ACCOUNT,
+    
+    -- Workload calculation (sum of credited teacher hours)
+    COALESCE(SUM(c.CREDITED_TEACHER_HOURS), 0) AS WORKLOAD
+    
+FROM 
+    INSTANCE.PROFESSOR p
+JOIN 
+    INSTANCE.TEACHER t ON t.ID = p.TEACHER_ID
+LEFT JOIN 
+    INSTANCE.COURSE c ON c.TEACHER = t.ID
+JOIN
+    INSTANCE.SEARCH_CRITERIA sc ON sc.SEMESTER_START = c.COURSE_START
+WHERE 
+    p.IS_ACTIVE = TRUE
+GROUP BY 
+    t.ID, t.NAME, p.CREDIT_HOUR_ACCOUNT]]></view_script>
+			<column name="TEACHER_ID" type="VARCHAR" />
+			<column name="TEACHER_NAME" type="VARCHAR" />
+			<column name="CREDIT_HOUR_ACCOUNT" type="DECIMAL" />
+			<column name="WORKLOAD" type="INTEGER" />
+		</view>
+		<view name="VW_OFFERED_COURSES" >
+			<comment><![CDATA[All courses that are offered this semester ("WS1516")]]></comment>
+			<view_script><![CDATA[CREATE OR REPLACE VIEW ${nameWithSchemaName} AS
+SELECT 
+    -- Search Criteria
+    sc.SEMESTER_START,
+    
+    -- Subject Details
+    s.SUBJECT_NUMBER,
+    s.SUBJECT_NAME,
+    s.PLANNED_STUPO_HOURS,
+    s.PLANNED_SCHEDULE_HOURS,
+    s.SUBJECT_TYPE,
+
+    -- Faculty
+    t.FACULTY AS EXPORTING_FACULTY,
+    s.FACULTY AS IMPORTING_FACULTY,
+    
+    -- Course Details
+    c.ACTUAL_STUPO_HOURS,
+    c.ACTUAL_SCHEDULE_HOURS,
+    c.CREDITED_TEACHER_HOURS,
+    
+    -- Teacher Details from Course
+    t.NAME AS TEACHER_NAME,
+    
+    -- Remarks
+    s.REMARK AS SUBJECT_REMARK,
+    t.REMARK AS TEACHER_REMARK
+
+FROM 
+    INSTANCE.SUBJECT s
+LEFT JOIN 
+    INSTANCE.COURSE c ON c.SUBJECT = s.SUBJECT_NUMBER 
+JOIN
+    INSTANCE.SEARCH_CRITERIA sc ON c.COURSE_START = sc.SEMESTER_START
+LEFT JOIN 
+    INSTANCE.TEACHER t ON t.ID = c.TEACHER
+ORDER BY s.SUBJECT ASC, s.SEMESTER ASC]]></view_script>
+			<column name="SEMESTER_START" type="VARCHAR" />
+			<column name="SUBJECT_NUMBER" type="VARCHAR" />
+			<column name="SUBJECT_NAME" type="VARCHAR" />
+			<column name="PLANNED_STUPO_HOURS" type="INTEGER" />
+			<column name="PLANNED_SCHEDULE_HOURS" type="INTEGER" />
+			<column name="SUBJECT_TYPE" type="CHAR" />
+			<column name="EXPORTING_FACULTY" type="VARCHAR" />
+			<column name="IMPORTING_FACULTY" type="VARCHAR" />
+			<column name="ACTUAL_STUPO_HOURS" type="INTEGER" />
+			<column name="ACTUAL_SCHEDULE_HOURS" type="INTEGER" />
+			<column name="CREDITED_TEACHER_HOURS" type="INTEGER" />
+			<column name="TEACHER_NAME" type="VARCHAR" />
+			<column name="SUBJECT_REMARK" type="VARCHAR" />
+			<column name="TEACHER_REMARK" type="VARCHAR" />
+		</view>
+		<view name="VW_OFFERED_SUBJECTS" >
+			<comment><![CDATA[All subjects that currently exist in the database.
+Based on the "Subject Form" screenshot.]]></comment>
+			<view_script><![CDATA[CREATE OR REPLACE VIEW ${nameWithSchemaName} AS 
+SELECT 
+    --subject
+    su.SUBJECT_NUMBER,
+    su.SUBJECT_NAME,
+    su.SUBJECT_TYPE,
+    su.REMARK,
+    su.PLANNED_STUPO_HOURS,
+    su.PLANNED_SCHEDULE_HOURS
+
+FROM INSTANCE.SUBJECT su]]></view_script>
+			<column name="SUBJECT_NUMBER" type="VARCHAR" />
+			<column name="SUBJECT_NAME" type="VARCHAR" />
+			<column name="SUBJECT_TYPE" type="CHAR" />
+			<column name="REMARK" type="VARCHAR" />
+			<column name="PLANNED_STUPO_HOURS" type="INTEGER" />
+			<column name="PLANNED_SCHEDULE_HOURS" type="INTEGER" />
+		</view>
+		<view name="VW_PROFESSOR_FUNCTION_LOAD" >
+			<comment><![CDATA[The professor function load for the selected semester ("WS1516").
+Based on the "Teaching Load Reduction - Input Form" screenshot.]]></comment>
+			<view_script><![CDATA[CREATE OR REPLACE VIEW ${nameWithSchemaName} AS
+SELECT 
+    -- Teacher details
+    t.NAME AS TEACHER_NAME,
+    
+    -- Function details
+    f.NAME AS FUNCTION_NAME,
+    f.FUNCTION_START,
+    
+    -- Workload (LOAD from FUNCTION_PROFESSOR table)
+    f.LOAD AS FUNCTION_LOAD
+
+FROM 
+    INSTANCE.FUNCTION_PROFESSOR f
+JOIN 
+    INSTANCE.PROFESSOR p ON p.TEACHER_ID = f.PROFESSOR
+JOIN 
+    INSTANCE.TEACHER t ON t.ID = p.TEACHER_ID
+JOIN 
+    INSTANCE.SEARCH_CRITERIA sc ON f.FUNCTION_START = sc.SEMESTER_START
+WHERE 
+    p.IS_ACTIVE = TRUE]]></view_script>
+			<column name="TEACHER_NAME" type="VARCHAR" />
+			<column name="FUNCTION_NAME" type="VARCHAR" />
+			<column name="FUNCTION_START" type="VARCHAR" />
+			<column name="FUNCTION_LOAD" type="INTEGER" />
+		</view>
+		<view name="VW_SELECTED_COURSE_DETAILS" >
+			<comment><![CDATA[All courses for the currently selected search critera.
+Based on the "Planning - Input Form" screenshot.]]></comment>
+			<view_script><![CDATA[CREATE OR REPLACE VIEW INSTANCE.VW_SELECTED_COURSE_DETAILS AS
+SELECT 
+    -- Search Criteria
+    sc.MAJOR,
+    sc.SEMESTER,
+    sc.SEMESTER_START,
+    
+    -- Subject Details
+    s.SUBJECT_NUMBER,
+    s.SUBJECT_NAME,
+    s.PLANNED_STUPO_HOURS,
+    s.PLANNED_SCHEDULE_HOURS,
+    s.SUBJECT_TYPE,
+
+    -- Faculty
+    t.FACULTY AS EXPORTING_FACULTY,
+    s.FACULTY AS IMPORTING_FACULTY,
+    
+    -- Course Details
+    c.ACTUAL_STUPO_HOURS,
+    c.ACTUAL_SCHEDULE_HOURS,
+    c.CREDITED_TEACHER_HOURS,
+    
+    -- Teacher Details from Course
+    t.NAME AS TEACHER_NAME,
+    
+    -- Remarks
+    s.REMARK AS SUBJECT_REMARK,
+    t.REMARK AS TEACHER_REMARK
+
+FROM 
+    INSTANCE.SEARCH_CRITERIA sc
+JOIN 
+    INSTANCE.SUBJECT s ON s.MAJOR = sc.MAJOR AND s.SEMESTER = sc.SEMESTER
+LEFT JOIN 
+    INSTANCE.COURSE c ON c.SUBJECT = s.SUBJECT_NUMBER AND c.COURSE_START = sc.SEMESTER_START
+LEFT JOIN 
+    INSTANCE.TEACHER t ON t.ID = c.TEACHER]]></view_script>
+			<column name="MAJOR" type="VARCHAR" />
+			<column name="SEMESTER" type="INTEGER" />
+			<column name="SEMESTER_START" type="VARCHAR" />
+			<column name="SUBJECT_NUMBER" type="VARCHAR" />
+			<column name="SUBJECT_NAME" type="VARCHAR" />
+			<column name="PLANNED_STUPO_HOURS" type="INTEGER" />
+			<column name="PLANNED_SCHEDULE_HOURS" type="INTEGER" />
+			<column name="SUBJECT_TYPE" type="CHAR" />
+			<column name="SUBJECT_FACULTY" type="VARCHAR" />
+			<column name="TEACHER_FACULTY" type="VARCHAR" />
+			<column name="ACTUAL_STUPO_HOURS" type="INTEGER" />
+			<column name="ACTUAL_SCHEDULE_HOURS" type="INTEGER" />
+			<column name="CREDITED_TEACHER_HOURS" type="INTEGER" />
+			<column name="TEACHER_NAME" type="VARCHAR" />
+			<column name="SUBJECT_REMARK" type="VARCHAR" />
+			<column name="TEACHER_REMARK" type="VARCHAR" />
+		</view>
+		<view name="VW_SELECTED_SERVICE_DETAILS" >
+			<comment><![CDATA[All services for the currently selected search critera.
+Based on the "Service" screenshot.]]></comment>
+			<view_script><![CDATA[CREATE OR REPLACE VIEW ${nameWithSchemaName} AS
+SELECT 
+    -- Search Criteria
+    sc.SEMESTER_START,
+    
+    -- Subject Details
+    s.SUBJECT_NUMBER,
+    s.SUBJECT_NAME,
+    s.PLANNED_STUPO_HOURS,
+    s.PLANNED_SCHEDULE_HOURS,
+    s.SUBJECT_TYPE,
+
+    -- Faculty
+    t.FACULTY AS EXPORTING_FACULTY,
+    s.FACULTY AS IMPORTING_FACULTY,
+    
+    -- Course Details
+    c.ACTUAL_STUPO_HOURS,
+    c.ACTUAL_SCHEDULE_HOURS,
+    c.CREDITED_TEACHER_HOURS,
+    
+    -- Teacher Details from Course
+    t.NAME AS TEACHER_NAME,
+    
+    -- Remarks
+    s.REMARK AS SUBJECT_REMARK,
+    t.REMARK AS TEACHER_REMARK
+
+FROM 
+    INSTANCE.SUBJECT s
+LEFT JOIN 
+    INSTANCE.COURSE c ON c.SUBJECT = s.SUBJECT_NUMBER 
+JOIN
+    INSTANCE.SEARCH_CRITERIA sc ON c.COURSE_START = sc.SEMESTER_START
+LEFT JOIN 
+    INSTANCE.TEACHER t ON t.ID = c.TEACHER
+WHERE t.FACULTY != s.FACULTY]]></view_script>
+			<column name="SEMESTER_START" type="VARCHAR" />
+			<column name="SUBJECT_NUMBER" type="VARCHAR" />
+			<column name="SUBJECT_NAME" type="VARCHAR" />
+			<column name="PLANNED_STUPO_HOURS" type="INTEGER" />
+			<column name="PLANNED_SCHEDULE_HOURS" type="INTEGER" />
+			<column name="SUBJECT_TYPE" type="CHAR" />
+			<column name="EXPORTING_FACULTY" type="VARCHAR" />
+			<column name="IMPORTING_FACULTY" type="VARCHAR" />
+			<column name="ACTUAL_STUPO_HOURS" type="INTEGER" />
+			<column name="ACTUAL_SCHEDULE_HOURS" type="INTEGER" />
+			<column name="CREDITED_TEACHER_HOURS" type="INTEGER" />
+			<column name="TEACHER_NAME" type="VARCHAR" />
+			<column name="SUBJECT_REMARK" type="VARCHAR" />
+			<column name="TEACHER_REMARK" type="VARCHAR" />
+		</view>
+		<view name="VW_SELECTED_SUBJECT_DETAILS" >
+			<comment><![CDATA[All subjects for the currently selected search criteria.]]></comment>
+			<view_script><![CDATA[CREATE OR REPLACE VIEW ${nameWithSchemaName} AS 
+SELECT 
+    --subject
+    su.SUBJECT_NUMBER,
+    su.SUBJECT_NAME,
+    su.SUBJECT_TYPE,
+    su.PLANNED_STUPO_HOURS,
+    su.PLANNED_SCHEDULE_HOURS,
+    su.SEMESTER,
+    su.MAJOR AS SUBJECT_MAJOR,
+    su.FACULTY AS SUBJECT_FACULTY,
+    su.REMARK,
+    --faculty
+    fa.NAME AS FACULTY_NAME,
+    --major
+    ma.NAME AS MAJOR_NAME
+  FROM INSTANCE.SUBJECT su
+INNER JOIN 
+    INSTANCE.FACULTY fa ON fa.ABBREVIATION = su.FACULTY
+INNER JOIN
+    INSTANCE.MAJOR ma ON ma.ABBREVIATION = su.MAJOR
+INNER JOIN
+    INSTANCE.SEARCH_CRITERIA sc ON sc.MAJOR = su.MAJOR  -- Join mit SEARCH_CRITERIA]]></view_script>
+			<column name="SUBJECT_NUMBER" type="VARCHAR" />
+			<column name="SUBJECT_NAME" type="VARCHAR" />
+			<column name="SUBJECT_TYPE" type="CHAR" />
+			<column name="PLANNED_STUPO_HOURS" type="INTEGER" />
+			<column name="PLANNED_SCHEDULE_HOURS" type="INTEGER" />
+			<column name="SEMESTER" type="INTEGER" />
+			<column name="SUBEJECT_MAJOR" type="VARCHAR" />
+			<column name="SUBJECT_FACULTY" type="VARCHAR" />
+			<column name="REMARK" type="VARCHAR" />
+			<column name="FACULTY_NAME" type="VARCHAR" />
+			<column name="MAJOR_NAME" type="VARCHAR" />
+		</view>
+		<procedure name="SP_UPDATE_CREDIT_HOUR_ACCOUNT" id="Procedure-1841" isSystem="false" params_known="n" >
+			<string><![CDATA[CREATE OR REPLACE PROCEDURE update_credit_hour_account(
+    IN semester_start VARCHAR(10)
+)
+LANGUAGE SQL
+BEGIN
+    DECLARE total_credited_teacher_hours INT DEFAULT 0;
+    DECLARE function_load INT DEFAULT 0;
+    DECLARE v_teacher_id VARCHAR(15);
+    DECLARE done INT DEFAULT 0;
+
+    -- go through all active professors
+    DECLARE cur CURSOR FOR
+        SELECT teacher_id
+        FROM INSTANCE.PROFESSOR
+        WHERE is_active = TRUE;
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+    OPEN cur;
+    FETCH cur INTO v_teacher_id;
+
+    -- loop through 
+    WHILE done = 0 DO
+        SET total_credited_teacher_hours = 0;
+        SET function_load = 0;
+
+        -- calculate credited teacher hours
+        SELECT COALESCE(SUM(credited_teacher_hours), 0)
+        INTO total_credited_teacher_hours
+        FROM INSTANCE.COURSE
+        WHERE teacher = v_teacher_id
+          AND course_start = semester_start;
+
+        -- calculate function load from FUNCTION_PROFESSOR
+        SELECT COALESCE(SUM(load), 0)
+        INTO function_load
+        FROM INSTANCE.FUNCTION_PROFESSOR
+        WHERE PROFESSOR = v_teacher_id
+          AND FUNCTION_START = semester_start;
+
+        -- add function load to the credited teacher hours
+        SET total_credited_teacher_hours = total_credited_teacher_hours + function_load;
+
+        -- subtract compulsory hours (18) from the total
+        SET total_credited_teacher_hours = total_credited_teacher_hours - 18;
+
+        -- update credit hour account
+        UPDATE INSTANCE.PROFESSOR
+        SET credit_hour_account = credit_hour_account + total_credited_teacher_hours
+        WHERE teacher_id = v_teacher_id;
+
+        FETCH cur INTO v_teacher_id;
+    END WHILE;
+    CLOSE cur;
+END;
+]]></string>
+		</procedure>
+		<trigger name="TR_CHECK_EXISTING_LECTURER" id="Trigger-1dcb" isSystem="false" >
+			<string><![CDATA[-- trigger for PROFESSOR table
+CREATE OR REPLACE TRIGGER check_existing_lecturer
+BEFORE INSERT ON instance.professor
+REFERENCING NEW AS NEW_ROW
+FOR EACH ROW
+BEGIN
+    IF EXISTS (SELECT 1 FROM instance.lecturer WHERE teacher_id = NEW_ROW.teacher_id) THEN
+        SIGNAL SQLSTATE '45000';
+    END IF;
+END;]]></string>
+		</trigger>
+		<trigger name="TR_CHECK_EXISTING_PROFESSOR" id="Trigger-1afa" isSystem="false" >
+			<string><![CDATA[CREATE OR REPLACE TRIGGER check_existing_professor
+BEFORE INSERT ON instance.lecturer
+REFERENCING NEW AS NEW_ROW
+FOR EACH ROW
+BEGIN
+    IF EXISTS (SELECT 1 FROM instance.professor WHERE teacher_id = NEW_ROW.teacher_id) THEN
+        SIGNAL SQLSTATE '45000';
+    END IF;
+END;]]></string>
+		</trigger>
+		<trigger name="TR_UPDATE_CREDIT_HOUR_ACCOUNT" id="Trigger-1b7d" isSystem="false" >
+			<string><![CDATA[-- trigger to update PROFESSOR
+CREATE OR REPLACE TRIGGER update_credit_hour_account
+AFTER UPDATE OF semester_start ON INSTANCE.SEARCH_CRITERIA
+REFERENCING OLD AS OLD_ROW NEW AS NEW_ROW
+FOR EACH ROW
+BEGIN
+    -- only if there is a difference
+    IF OLD_ROW.semester_start <> NEW_ROW.semester_start THEN
+        -- call sp
+        CALL update_credit_hour_account(OLD_ROW.semester_start);
+    END IF;
+END;]]></string>
+		</trigger>
+	</schema>
+	<layout name="Global Data Model" id="Layout-106f" confirmed="y" show_relation="columns" >
+		<entity schema="GLOBAL_DATA_MODEL.INSTANCE" name="COURSE" color="C1D8EE" x="374" y="561" />
+		<entity schema="GLOBAL_DATA_MODEL.INSTANCE" name="FACULTY" color="C1D8EE" x="697" y="255" />
+		<entity schema="GLOBAL_DATA_MODEL.INSTANCE" name="FUNCTION_PROFESSOR" color="C1D8EE" x="51" y="255" />
+		<entity schema="GLOBAL_DATA_MODEL.INSTANCE" name="LECTURER" color="C1D8EE" x="527" y="51" />
+		<entity schema="GLOBAL_DATA_MODEL.INSTANCE" name="MAJOR" color="C1D8EE" x="1020" y="255" />
+		<entity schema="GLOBAL_DATA_MODEL.INSTANCE" name="PROFESSOR" color="C1D8EE" x="221" y="51" />
+		<entity schema="GLOBAL_DATA_MODEL.INSTANCE" name="SEARCH_CRITERIA" color="C1D8EE" x="85" y="442" />
+		<entity schema="GLOBAL_DATA_MODEL.INSTANCE" name="SUBJECT" color="C1D8EE" x="816" y="544" />
+		<entity schema="GLOBAL_DATA_MODEL.INSTANCE" name="TEACHER" color="C1D8EE" x="391" y="255" />
+		<entity schema="GLOBAL_DATA_MODEL.INSTANCE" name="VW_ACTIVE_LECTURER_WORKLOAD" color="3986C1" x="1598" y="816" />
+		<entity schema="GLOBAL_DATA_MODEL.INSTANCE" name="VW_ACTIVE_PROFESSOR_WORKLOAD" color="3986C1" x="1241" y="816" />
+		<entity schema="GLOBAL_DATA_MODEL.INSTANCE" name="VW_OFFERED_COURSES" color="3986C1" x="1547" y="119" />
+		<entity schema="GLOBAL_DATA_MODEL.INSTANCE" name="VW_OFFERED_SUBJECTS" color="3986C1" x="1258" y="119" />
+		<entity schema="GLOBAL_DATA_MODEL.INSTANCE" name="VW_PROFESSOR_FUNCTION_LOAD" color="3986C1" x="1241" y="952" />
+		<entity schema="GLOBAL_DATA_MODEL.INSTANCE" name="VW_SELECTED_COURSE_DETAILS" color="3986C1" x="1547" y="425" />
+		<entity schema="GLOBAL_DATA_MODEL.INSTANCE" name="VW_SELECTED_SERVICE_DETAILS" color="3986C1" x="1853" y="425" />
+		<entity schema="GLOBAL_DATA_MODEL.INSTANCE" name="VW_SELECTED_SUBJECT_DETAILS" color="3986C1" x="1241" y="425" />
+		<script name="SQL_Editor" id="Editor-1001" language="SQL" >
+			<string><![CDATA[INSERT INTO instance.SEARCH_CRITERIA (semester_start, major, semester)
+VALUES ('SS15', 'SWB', 6);
+
+select * from instance.search_criteria
+
+UPDATE instance.SEARCH_CRITERIA
+SET semester_start = 'SS15'
+
+update instance.professor
+set credit_hour_account = 0
+CALL calculate_credited_teacher_hours('WS1516');
+
+
+-- Stored procedure for PROFESSOR
+CREATE OR REPLACE PROCEDURE calculate_credited_teacher_hours(
+    IN semester_start VARCHAR(10)
+)
+LANGUAGE SQL
+BEGIN
+    DECLARE total_credited_teacher_hours INT;
+
+    -- Iteriere über alle aktiven Professoren
+    FOR teacher_id AS
+        SELECT teacher_id
+        FROM INSTANCE.PROFESSOR
+        WHERE is_active = 1
+    DO
+        -- Setze total_credited_teacher_hours für jeden Professor auf 0 zurück
+        SET total_credited_teacher_hours = 0;
+
+        -- Berechnung der credited_teacher_hours für den Lehrer und semester_start
+        SELECT SUM(credited_teacher_hours)
+        INTO total_credited_teacher_hours
+        FROM INSTANCE.COURSE
+        WHERE teacher = teacher_id
+          AND course_start = semester_start;
+
+        -- Subtrahiere 18 Stunden
+        SET total_credited_teacher_hours = COALESCE(total_credited_teacher_hours, 0) - 18;
+
+        -- Update der Professoren-Tabelle
+        UPDATE INSTANCE.PROFESSOR
+        SET credit_hour_account = credit_hour_account + total_credited_teacher_hours
+        WHERE teacher_id = teacher_id;
+    END FOR;
+END;
+
+
+-- trigger to update PROFESSOR
+CREATE OR REPLACE TRIGGER update_credit_hour_account
+AFTER UPDATE OF semester_start ON INSTANCE.SEARCH_CRITERIA
+REFERENCING OLD AS OLD_ROW NEW AS NEW_ROW
+FOR EACH ROW
+BEGIN
+    -- only if there is a difference
+    IF OLD_ROW.semester_start <> NEW_ROW.semester_start THEN
+        -- call sp
+        CALL calculate_credited_teacher_hours(OLD_ROW.semester_start);
+    END IF;
+END;
+]]></string>
+		</script>
+		<script name="SQL_Editor_001" id="Editor-1c29" language="SQL" >
+			<string><![CDATA[select * from INSTANCE.VW_COURSE_DETAILS]]></string>
+		</script>
+		<script name="SQL_Editor_002" id="Editor-20d7" language="SQL" >
+			<string><![CDATA[select * from instance.vw_course_details]]></string>
+		</script>
+		<script name="SQL_Editor_003" id="Editor-19fb" language="SQL" >
+			<string><![CDATA[update instance.professor
+set credit_hour_account = 0
+
+select sum(credited_teacher_hours) from instance.course
+where teacher = 7 and course_start = 'WS1516']]></string>
+		</script>
+		<browser id="Browse-9bd" name="COURSE" confirm_updates="y" confirmed="y" >
+			<browse_table schema="GLOBAL_DATA_MODEL.INSTANCE" entity="COURSE" x="20" y="20" width="366" height="356" />
+		</browser>
+	</layout>
+	<layout name="Lecturer Workload Planning View" id="Layout-17b4" confirmed="y" show_relation="columns" >
+		<entity schema="GLOBAL_DATA_MODEL.INSTANCE" name="COURSE" color="3986C1" x="51" y="272" />
+		<entity schema="GLOBAL_DATA_MODEL.INSTANCE" name="LECTURER" color="3986C1" x="289" y="51" />
+		<entity schema="GLOBAL_DATA_MODEL.INSTANCE" name="TEACHER" color="3986C1" x="51" y="51" />
+	</layout>
+	<layout name="Professor Workload Planning View" id="Layout-b87" confirmed="y" show_relation="columns" >
+		<entity schema="GLOBAL_DATA_MODEL.INSTANCE" name="COURSE" color="3986C1" x="289" y="255" />
+		<entity schema="GLOBAL_DATA_MODEL.INSTANCE" name="FUNCTION_PROFESSOR" color="3986C1" x="51" y="289" />
+		<entity schema="GLOBAL_DATA_MODEL.INSTANCE" name="PROFESSOR" color="3986C1" x="51" y="51" />
+		<entity schema="GLOBAL_DATA_MODEL.INSTANCE" name="TEACHER" color="3986C1" x="374" y="51" />
+	</layout>
+	<layout name="Semester-Specific Course Planning View" id="Layout-1d4a" confirmed="y" show_relation="columns" >
+		<entity schema="GLOBAL_DATA_MODEL.INSTANCE" name="COURSE" color="3986C1" x="272" y="51" />
+		<entity schema="GLOBAL_DATA_MODEL.INSTANCE" name="FACULTY" color="3986C1" x="663" y="459" />
+		<entity schema="GLOBAL_DATA_MODEL.INSTANCE" name="MAJOR" color="3986C1" x="935" y="51" />
+		<entity schema="GLOBAL_DATA_MODEL.INSTANCE" name="SUBJECT" color="3986C1" x="595" y="51" />
+		<entity schema="GLOBAL_DATA_MODEL.INSTANCE" name="TEACHER" color="3986C1" x="51" y="51" />
+	</layout>
+	<layout name="Subject Creation View" id="Layout-983" confirmed="y" show_relation="columns" >
+		<entity schema="GLOBAL_DATA_MODEL.INSTANCE" name="FACULTY" color="3986C1" x="459" y="187" />
+		<entity schema="GLOBAL_DATA_MODEL.INSTANCE" name="SUBJECT" color="3986C1" x="51" y="51" />
+	</layout>
+</project>
